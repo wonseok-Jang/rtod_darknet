@@ -34,7 +34,7 @@ static double latency[iteration];
 
 double frame_timestamp[3];
 static int buff_index=0;
-int counter=0;
+int cnt=0;
 int sleep_time = 0;
 
 static double detect_start;
@@ -117,9 +117,9 @@ void *fetch_in_thread(void *ptr)
 
 	fetch_time = gettimeafterboot() - fetch_start;
 
-	if(counter >= start_log){
-		fetch_array[counter-start_log]=fetch_time;
-		image_waiting_array[counter-start_log]=image_waiting_time;
+	if(cnt >= start_log){
+		fetch_array[cnt-start_log]=fetch_time;
+		image_waiting_array[cnt-start_log]=image_waiting_time;
 	}
 
 	printf("fetch_time : %f\n", fetch_time);
@@ -152,7 +152,7 @@ void *detect_in_thread(void *ptr)
 
 	detect_time = gettimeafterboot() - detect_start;
 
-	if(counter >= start_log) detect_array[counter-start_log]=detect_time;
+	if(cnt >= start_log) detect_array[cnt-start_log]=detect_time;
 
 	printf("Detect time : %f\n", detect_time);
     return 0;
@@ -271,6 +271,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     int send_http_post_once = 0;
     const double start_time_lim = get_time_point();
     double before = get_time_point();
+    double before_1 = gettimeafterboot();
     double start_time = get_time_point();
     float avg_fps = 0;
     int frame_counter = 0;
@@ -397,9 +398,13 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 				//double after = get_wall_time();
 				//float curr = 1./(after - before);
 				double after = get_time_point();    // more accurate time measurements
+				double after_1 = gettimeafterboot();    // more accurate time measurements
 				float curr = 1000000. / (after - before);
+				float curr_1 = 1000. / (after_1 - before_1);
 				fps = fps*0.9 + curr*0.1;
+				//fps = curr_1;
 				before = after;
+				before_1 = after_1;
 
 				float spent_time = (get_time_point() - start_time) / 1000000;
 				frame_counter++;
@@ -411,17 +416,17 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 				}
 			}
 
-			if(counter>=start_log){
-				fps_array[counter-start_log]=fps;
-				latency[counter-start_log]=display_end-frame_timestamp[(buff_index+2)%3];
-				display_array[counter-start_log]=display_time;
-				slack[count-start_log]=(detect_time)-(sleep_time+fetch_time);
+			if(cnt>=start_log){
+				fps_array[cnt-start_log]=fps;
+				latency[cnt-start_log]=display_end-frame_timestamp[(buff_index+1)%3];
+				display_array[cnt-start_log]=display_time;
+				slack[cnt-start_log]=(detect_time)-(sleep_time+fetch_time);
 
-				printf("latency[%d]: %f\n",counter-start_log,latency[counter-start_log]);
-				printf("count : %d\n",counter);
+				printf("latency[%d]: %f\n",cnt-start_log,latency[cnt-start_log]);
+				printf("count : %d\n",cnt);
 			}
 
-			if(counter==(iteration+start_log-1)){
+			if(cnt==(iteration+start_log-1)){
 				FILE *fp;
 				char s1[35]="single_cam/original";
 				char s2[4];
@@ -448,9 +453,9 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 				break;
 			}
 
-			counter++;
+			cnt++;
 		}
-		counter = 0;
+		cnt = 0;
 	}
 	
 	//print average data
