@@ -15,8 +15,8 @@
 #include <sys/time.h>
 #endif
 
-#define iteration 1000
-#define start_log 25
+#define iteration 3
+#define start_log 0
 #define cycle 1
 
 #ifdef OPENCV
