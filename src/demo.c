@@ -401,8 +401,8 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 				double after_1 = gettimeafterboot();    // more accurate time measurements
 				float curr = 1000000. / (after - before);
 				float curr_1 = 1000. / (after_1 - before_1);
-				fps = fps*0.9 + curr*0.1;
-				//fps = curr_1;
+				//fps = fps*0.9 + curr*0.1;
+				fps = curr_1;
 				before = after;
 				before_1 = after_1;
 
@@ -428,7 +428,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
 			if(cnt==(iteration+start_log-1)){
 				FILE *fp;
-				char s1[35]="single_cam/original";
+				char s1[35]="single_cam/syncfetch";
 				char s2[4];
 				sprintf(s2,"%d",sleep_time);
 				char s3[5]=".csv";
