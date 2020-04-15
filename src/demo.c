@@ -15,8 +15,8 @@
 #include <sys/time.h>
 #endif
 
-#define iteration 3
-#define start_log 0
+#define iteration 1000
+#define start_log 25
 #define cycle 1
 
 #ifdef OPENCV
@@ -437,7 +437,8 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
 			if(cnt==((iteration+start_log)-1)){
 				FILE *fp;
-				char s1[35]="single_cam/offset_";
+				//char s1[35]="single_cam/offset_";
+				char s1[35]="multi_cam/test_2";
 				char s2[4];
 				sprintf(s2,"%d",sleep_time);
 				char s3[5]=".csv";
