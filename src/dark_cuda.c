@@ -157,6 +157,40 @@ cudaStream_t get_cuda_memcpy_stream() {
     return streamsArray2[i];
 }
 
+cudaStream_t get_cuda_stream_with_index(int index) {
+    int i = cuda_get_device();
+    if (!streamInit[index]) {
+        //printf("Create CUDA-stream \n");
+        cudaError_t status = cudaStreamCreate(&streamsArray[index]);
+        //cudaError_t status = cudaStreamCreateWithFlags(&streamsArray[i], cudaStreamNonBlocking);
+        if (status != cudaSuccess) {
+            printf(" cudaStreamCreate error: %d \n", status);
+            const char *s = cudaGetErrorString(status);
+            printf("CUDA Error: %s\n", s);
+            status = cudaStreamCreateWithFlags(&streamsArray[index], cudaStreamDefault);
+            CHECK_CUDA(status);
+        }
+        streamInit[index] = 1;
+    }
+    return streamsArray[index];
+}
+
+cudaStream_t get_cuda_memcpy_stream_with_index(int index) {
+    int i = cuda_get_device();
+    if (!streamInit2[index]) {
+        cudaError_t status = cudaStreamCreate(&streamsArray2[index]);
+        //cudaError_t status = cudaStreamCreateWithFlags(&streamsArray2[i], cudaStreamNonBlocking);
+        if (status != cudaSuccess) {
+            printf(" cudaStreamCreate-Memcpy error: %d \n", status);
+            const char *s = cudaGetErrorString(status);
+            printf("CUDA Error: %s\n", s);
+            status = cudaStreamCreateWithFlags(&streamsArray2[index], cudaStreamDefault);
+            CHECK_CUDA(status);
+        }
+        streamInit2[index] = 1;
+    }
+    return streamsArray2[index];
+}
 
 #ifdef CUDNN
 cudnnHandle_t cudnn_handle()
@@ -171,6 +205,20 @@ cudnnHandle_t cudnn_handle()
         CHECK_CUDNN(status);
     }
     return handle[i];
+}
+
+cudnnHandle_t cudnn_handle_with_index(int index)
+{
+    static int init[16] = {0};
+    static cudnnHandle_t handle[16];
+    int i = cuda_get_device();
+    if(!init[index]) {
+        cudnnCreate(&handle[index]);
+        init[i] = 1;
+        cudnnStatus_t status = cudnnSetStream(handle[index], get_cuda_stream(index));
+        CHECK_CUDNN(status);
+    }
+    return handle[index];
 }
 
 

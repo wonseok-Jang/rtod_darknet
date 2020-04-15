@@ -77,13 +77,16 @@ extern "C" {
     float cuda_compare(float *x_gpu, float *x, size_t n, char *s);
     dim3 cuda_gridsize(size_t n);
     cudaStream_t get_cuda_stream();
+    cudaStream_t get_cuda_stream_with_index(int index);
     cudaStream_t get_cuda_memcpy_stream();
+    cudaStream_t get_cuda_memcpy_stream_with_index(int index);
     int get_number_of_blocks(int array_size, int block_size);
     int get_gpu_compute_capability(int i);
     void show_cuda_cudnn_info();
 
 #ifdef CUDNN
 cudnnHandle_t cudnn_handle();
+cudnnHandle_t cudnn_handle_with_index(int index);
 enum {cudnn_fastest, cudnn_smallest, cudnn_specify};
 
 void cudnn_check_error_extended(cudnnStatus_t status, const char *file, int line, const char *date_time);
