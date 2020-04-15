@@ -170,7 +170,7 @@ double get_wall_time()
 
 void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int cam_index, const char *filename, char **names, int classes,
     int frame_skip, char *prefix, char *out_filename, int mjpeg_port, int json_port, int dont_show, int ext_output, int letter_box_in, int time_limit_sec, char *http_post_host,
-    int benchmark, int benchmark_layers, int opencv_buffer_size, int offset)
+    int benchmark, int benchmark_layers, int opencv_buffer_size, int offset, int process_num)
 {
     letter_box = letter_box_in;
     in_img = det_img = show_img = NULL;
@@ -437,10 +437,9 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
 			if(cnt==((iteration+start_log)-1)){
 				FILE *fp;
-				//char s1[35]="single_cam/offset_";
-				char s1[35]="multi_cam/test_2";
+				char s1[35]="multi_cam/process_";
 				char s2[4];
-				sprintf(s2,"%d",sleep_time);
+				sprintf(s2,"%d",process_num);
 				char s3[5]=".csv";
 				strcat(s1,s2);
 				strcat(s1,s3);
