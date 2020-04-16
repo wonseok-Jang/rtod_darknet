@@ -54,6 +54,7 @@ void make_window(char *name, int w, int h, int fullscreen);
 void show_image_cv(image p, const char *name);
 //void show_image_cv_ipl(mat_cv *disp, const char *name);
 void show_image_mat(mat_cv *mat_ptr, const char *name);
+void show_multiple_image_mat(mat_cv *mat_ptr, mat_cv *mat_ptr_1, const char *name);
 
 // Video Writer
 write_cv *create_video_writer(char *out_filename, char c1, char c2, char c3, char c4, int fps, int width, int height, int is_color);

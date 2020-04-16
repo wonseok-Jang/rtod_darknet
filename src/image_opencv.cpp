@@ -91,7 +91,9 @@ extern "C" {
 // cv::Mat
 // ====================================================================
     image mat_to_image(cv::Mat mat);
+    image mat_to_image(cv::Mat mat_1);
     cv::Mat image_to_mat(image img);
+    cv::Mat image_to_mat(image img_1);
 //    image ipl_to_image(mat_cv* src);
 //    mat_cv *image_to_ipl(image img);
 //    cv::Mat ipl_to_mat(IplImage *ipl);
@@ -470,6 +472,23 @@ extern "C" void show_image_mat(mat_cv *mat_ptr, const char *name)
         cv::Mat &mat = *(cv::Mat *)mat_ptr;
         cv::namedWindow(name, cv::WINDOW_NORMAL);
         cv::imshow(name, mat);
+    }
+    catch (...) {
+        cerr << "OpenCV exception: show_image_mat \n";
+    }
+}
+
+extern "C" void show_multiple_image_mat(mat_cv *mat_ptr, mat_cv *mat_ptr_1, const char *name)
+{
+    try {
+        if (mat_ptr == NULL) return;
+        cv::Mat &mat = *(cv::Mat *)mat_ptr;
+        cv::Mat &mat_1 = *(cv::Mat *)mat_ptr_1;
+        cv::Mat merge;
+
+		cv::hconcat(mat, mat_1, merge);
+        cv::namedWindow(name, cv::WINDOW_NORMAL);
+        cv::imshow(name, merge);
     }
     catch (...) {
         cerr << "OpenCV exception: show_image_mat \n";
