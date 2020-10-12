@@ -10,6 +10,8 @@
 #include "rtod.h"
 #include "darknet.h"
 
+#define ACCURACY
+
 #ifdef WIN32
 #include <time.h>
 #include "gettimeofday.h"
@@ -74,7 +76,9 @@ extern double b_fetch_max = 0;
 int contention_free = 0;
 #endif
 
-#define OUT_PATH "/aveesSSD/jang/results/"
+#ifdef ZERO_SLACK
+#define OUT_PATH "/aveesSSD/jang/AlexeyAB/darknet/revision/measure/result_txt/"
+#endif
 
 int write_result_output()
 {
@@ -88,10 +92,8 @@ int write_result_output()
 
     out_file = buf;
 
-    printf("count : %d\n", exist);
     if(exist) inter_frame_index += det_res[display_index].frame_gap; 
     else inter_frame_index = 1;
-    printf("count : %d\n", inter_frame_index);
 
     sprintf(out_file, "%06d", inter_frame_index);
 
@@ -117,12 +119,12 @@ int write_result_output()
         }
     }
     else exist = 1;
-    fprintf(fp, "%s,%s,%s,%s,%s\n", "name", "left", "top", "width", "height");
+    fprintf(fp, "%s,%s,%s,%s,%s,%s\n", "name", "left", "top", "width", "height", "prob");
 
-    for(int i; i < num_object; i++){
-        fprintf(fp, "%s,%d,%d,%d,%d\n", det_res[display_index].name[i]
+    for(int i = 0; i < num_object; i++){
+        fprintf(fp, "%s,%d,%d,%d,%d,%0.2f\n", det_res[display_index].name[i]
                 , det_res[display_index].box_left[i], det_res[display_index].box_top[i]
-                , det_res[display_index].box_width[i], det_res[display_index].box_height[i]);
+                , det_res[display_index].box_width[i], det_res[display_index].box_height[i], det_res[display_index].prob[i] * 100.0);
     }
 
     fclose(fp);
@@ -188,6 +190,9 @@ int check_on_demand()
 
 void *rtod_fetch_thread(void *ptr)
 {
+    //fetch_offset = 70;
+    //fetch_offset = 140;
+    //fetch_offset = 150;
     usleep(fetch_offset * 1000);
 
     start_fetch = gettime_after_boot();
@@ -197,10 +202,8 @@ void *rtod_fetch_thread(void *ptr)
         in_s = get_image_from_stream_letterbox(cap, net.w, net.h, net.c, &in_img, dont_close_stream);
     else{
 #ifdef V4L2
-        frame[buff_index].frame = capture_image(&frame[buff_index]);
-        letterbox_image_into(frame[buff_index].frame, net.w, net.h, frame[buff_index].resize_frame);
-        //frame[buff_index].resize_frame = letterbox_image(frame[buff_index].frame, net.w, net.h);
-        //show_image_cv(frame[buff_index].resize_frame,"im");
+        frame[buff_index].resize_frame = letterbox_image(frame[buff_index].frame, net.w, net.h);
+        show_image_cv(frame[buff_index].resize_frame,"im");
 
         if(!frame[buff_index].resize_frame.data){
             printf("Stream closed.\n");
@@ -217,6 +220,7 @@ void *rtod_fetch_thread(void *ptr)
             //exit(EXIT_FAILURE);
             return 0;
         }
+
 #endif
     }
     end_fetch = gettime_after_boot();
@@ -270,6 +274,7 @@ void *rtod_inference_thread(void *ptr)
     else
         dets = get_network_boxes(&net, net.w, net.h, demo_thresh, demo_thresh, 0, 1, &nboxes, 0); // resized
 #endif
+
     end_infer = gettime_after_boot();
 
     d_infer = end_infer - start_infer;
@@ -366,14 +371,14 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     pthread_t fetch_thread;
     pthread_t inference_thread;
 
-//#ifndef V4L2
-//    ondemand = check_on_demand();
-//
-//    if(ondemand != 1) { 
-//        fprintf(stderr, "ERROR : R-TOD needs on-demand capture.\n");
-//        exit(0);
-//    }
-//#endif
+#ifndef V4L2
+    ondemand = check_on_demand();
+
+    if(ondemand != 1) { 
+        fprintf(stderr, "ERROR : R-TOD needs on-demand capture.\n");
+        exit(0);
+    }
+#endif
 
     printf("Object detector information:\n"
             "  Capture: \"%s\"\n"
@@ -457,7 +462,7 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             detect_index = (buff_index + 2) %3;
 #else
             display_index = (buff_index + 2) %3;
-            detect_index = (buff_index) %3;
+            detect_index = (buff_index) % 3;
 #endif
             const float nms = .45;    // 0.4F
             int local_nboxes = nboxes;
@@ -470,7 +475,6 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             /* Fork Inference thread */
             if(pthread_create(&inference_thread, 0, rtod_inference_thread, 0)) error("Thread creation failed");
 #endif
-
             /* display thread */
 
             printf("\033[2J");
@@ -518,12 +522,14 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
             if (!benchmark) draw_detections_cv_v3(show_img, local_dets, local_nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, demo_ext_output);
 
+#ifdef ACCURACY
             int c = write_result_output();
+#endif
 
             draw_bbox_time = gettime_after_boot() - start_disp;
 
             free_detections(local_dets, local_nboxes);
-
+            
             if(!prefix){
                 if (!dont_show) {
                     show_image_mat(show_img, "Demo");
@@ -547,7 +553,7 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             }else{
                 printf("%d\n", inter_frame_index);
                 char buff[256];
-                char ext_file[256] = "/aveesSSD/jang/AlexeyAB/darknet/result_image/";
+                char ext_file[256] = "/aveesSSD/jang/AlexeyAB/darknet/revision/measure/result_image/";
                 sprintf(buff, "%06d.jpg", inter_frame_index);
                 strcat(ext_file, buff);
                 if(show_img) save_cv_jpg(show_img, ext_file);
@@ -583,11 +589,11 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
                 free_image(det_s);
             }
 
-            /* Change infer image for next object detection cycle*/
+            /* Change infer image for next object detection cycle */
+#ifndef ZERO_SLACK
             det_img = in_img;
             det_s = in_s;
 
-#ifndef ZERO_SLACK
             rtod_inference_thread(0);
 #endif
 
@@ -602,8 +608,14 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 #ifndef V4L2
                 if(!benchmark) release_mat(&show_img);
 #endif
+
                 show_img = det_img;
+                show_s = det_s;
             }
+#ifdef ZERO_SLACK
+            det_img = in_img;
+            det_s = in_s;
+#endif
             cycle_end = gettime_after_boot();
         }
         --delay;
@@ -654,8 +666,6 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             slack[cnt - CYCLE_OFFSET] = slack_time;
             num_object_array[cnt - CYCLE_OFFSET] = num_object;
 
-            //printf("num_object : %d\n", num_object);
-            //printf("slack: %f\n",slack[cnt-CYCLE_OFFSET]);
             printf("latency: %f\n",e2e_delay[cnt - CYCLE_OFFSET]);
             printf("cnt : %d\n",cnt);
         }
@@ -672,8 +682,8 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             b_fetch_max = MAX(b_fetch_max, b_fetch);
         }
         else if(cnt == (CYCLE_OFFSET - 1)){
-            //fetch_offset = (int)(s_min - e_fetch_max - b_fetch_max);
-            fetch_offset = 0;
+            fetch_offset = (int)(s_min - e_fetch_max - b_fetch_max);
+            //fetch_offset = 0;
             printf("fetch_offset : %d\n", fetch_offset);
 
             measure = 0;
@@ -740,6 +750,7 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 #endif
         if(cnt != ((OBJ_DET_CYCLE_IDX + CYCLE_OFFSET)-1)) cnt++;
         buff_index = (buff_index + 1) % 3;
+        //buff_index += 1;
     }
     cnt = 0;
 

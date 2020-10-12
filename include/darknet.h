@@ -1021,12 +1021,13 @@ double gettime_after_boot();
 int write_result_output();
 
 struct det_result {
-    char *name[20];
-    int box_left[20];
-    int box_top[20];
-    int box_width[20];
-    int box_height[20];
+    char *name[50];
+    int box_left[50];
+    int box_top[50];
+    int box_width[50];
+    int box_height[50];
     int frame_gap;
+    double prob[50];
 };
 
 struct frame_data {

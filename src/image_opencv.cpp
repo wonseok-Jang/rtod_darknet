@@ -981,7 +981,6 @@ extern "C" {
                 for (j = 0; j < classes; ++j) {
                     int show = strncmp(names[j], "dont_show", 9);
                     if (dets[i].prob[j] > thresh && show) {
-                        k++;
                         if (class_id < 0) {
                             strcat(labelstr, names[j]);
                             class_id = j;
@@ -989,14 +988,18 @@ extern "C" {
                             sprintf(buff, " (%2.0f%%)", dets[i].prob[j] * 100);
                             strcat(labelstr, buff);
                             printf("%s: %.0f%% ", names[j], dets[i].prob[j] * 100);
-                            det_res[display_index].name[i] = names[j];
+                            det_res[display_index].name[k] = names[j];
+                            det_res[display_index].prob[k] = dets[i].prob[j];
+                            //printf("log %s: %.0f%% ", det_res[display_index].name[i], dets[i].prob[j] * 100);
                         }
                         else {
                             strcat(labelstr, ", ");
                             strcat(labelstr, names[j]);
                             printf(", %s: %.0f%% ", names[j], dets[i].prob[j] * 100);
                             det_res[display_index].name[i] = names[j];
+                            det_res[display_index].prob[k] = dets[i].prob[j];
                         }
+                        k++;
                     }
                 }
                 if (class_id >= 0) {
@@ -1087,10 +1090,10 @@ extern "C" {
                     if (ext_output){
                         extern int box_pos[20][4];
 
-                        det_res[display_index].box_left[i] = left;
-                        det_res[display_index].box_top[i] = top;
-                        det_res[display_index].box_width[i] = b.w*show_img->cols;
-                        det_res[display_index].box_height[i] = b.h*show_img->rows;
+                        det_res[display_index].box_left[k-1] = left;
+                        det_res[display_index].box_top[k-1] = top;
+                        det_res[display_index].box_width[k-1] = b.w*show_img->cols;
+                        det_res[display_index].box_height[k-1] = b.h*show_img->rows;
                     }
                     if (ext_output)
                         printf("\t(left_x: %4.0f   top_y: %4.0f   width: %4.0f   height: %4.0f)\n",

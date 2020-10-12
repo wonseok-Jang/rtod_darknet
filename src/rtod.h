@@ -4,7 +4,7 @@
 #include "image.h"
 
 #if (defined ZERO_SLACK)
-#define CYCLE_OFFSET 25 
+#define CYCLE_OFFSET 180
 #else
 #define CYCLE_OFFSET 25
 #endif
@@ -118,12 +118,17 @@ char **demo_names;
 image **demo_alphabet;
 int demo_classes;
 
+//int nboxes[2];
+//detection* dets[2];
+
 int nboxes;
 detection *dets;
+
 
 network net;
 image in_s ;
 image det_s;
+image show_s;
 
 cap_cv *cap;
 float fps;
