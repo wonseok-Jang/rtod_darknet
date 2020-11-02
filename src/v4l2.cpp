@@ -393,8 +393,7 @@ extern "C" {
         fd = open(cam_dev, O_RDWR | O_NONBLOCK, 0);
         if (fd == -1)
         {
-            fprintf(stderr, "VIDEOIO ERROR : Opening video device");
-            //return -1;
+            fprintf(stderr, "VIDEOIO ERROR : Opening video device\n");
             return NULL;
         }
 
@@ -403,18 +402,15 @@ extern "C" {
         if (set_framerate(fd, fps) < 0)
         {
             fprintf(stderr, "VIDEOIO ERROR : Unable to set camera FPS\n");
-            //return -1;
             return NULL;
         }
 
         if(init_mmap(fd) == -1)
         {
-            fprintf(stderr, "VIDEOIO ERROR : Fail memory mapping");
-            //return -1;
+            fprintf(stderr, "VIDEOIO ERROR : Fail memory mapping\n");
             return NULL;
         }
 
-        //return 1;
 		return &fd;
     }
 }

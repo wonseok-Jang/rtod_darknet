@@ -356,6 +356,7 @@ void run_yolo(int argc, char **argv)
 	int w = find_int_arg(argc, argv, "-w", 640);
 	int h = find_int_arg(argc, argv, "-h", 480);
 	int fps = find_int_arg(argc, argv, "-fps", 30);
+	int const_cap = find_arg(argc, argv, "-const_capture");
 
     if(argc < 4){
         fprintf(stderr, "usage: %s %s [train/test/valid] [cfg] [weights (optional)]\n", argv[0], argv[1]);
@@ -372,6 +373,6 @@ void run_yolo(int argc, char **argv)
     else if(0==strcmp(argv[2], "demo")) demo(cfg, weights, thresh, hier_thresh, cam_index, filename, voc_names, 20, frame_skip,
 		prefix, out_filename, mjpeg_port, json_port, dont_show, ext_output, 0, 0, 0, 0, 0);
     else if(0==strcmp(argv[2], "rtod")) rtod(cfg, weights, thresh, hier_thresh, cam_index, filename, voc_names, 20, frame_skip,
-		prefix, out_filename, mjpeg_port, json_port, dont_show, ext_output, 0, 0, 0, 0, 0, w, h, fps);
+		prefix, out_filename, mjpeg_port, json_port, dont_show, ext_output, 0, 0, 0, 0, 0, w, h, fps, const_cap);
 
 }

@@ -243,7 +243,7 @@ void *rtod_display_thread(void *ptr)
 
 void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int cam_index, const char *filename, char **names, int classes,
         int frame_skip, char *prefix, char *out_filename, int mjpeg_port, int json_port, int dont_show, int ext_output, int letter_box_in, int time_limit_sec, char *http_post_host,
-        int benchmark, int benchmark_layers, int w, int h, int cam_fps)
+        int benchmark, int benchmark_layers, int w, int h, int cam_fps, int const_cap)
 {
     letter_box = letter_box_in;
     in_img = det_img = show_img = NULL;
@@ -269,6 +269,8 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 	int img_w = w;
 	int img_h = h;
 	int cam_frame_rate= cam_fps;
+	int demo_const_cap = const_cap;
+
     char pipeline[2][256] = {"Zero-slack", "Contention free"};
 
     if(filename){
@@ -286,7 +288,8 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
         fd_handler = open_device(cam_dev, cam_frame_rate, img_w, img_h);
         if(fd_handler ==  NULL)
         {
-            error("Couldn't connect to webcam.\n");
+            perror("Couldn't connect to webcam.\n");
+			exit(0);
         }
 #else
         cap = get_capture_webcam_with_prop(cam_index, img_w, img_h, cam_frame_rate);
@@ -294,10 +297,17 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 #ifdef WIN32
             printf("Check that you have copied file opencv_ffmpeg340_64.dll to the same directory where is darknet.exe \n");
 #endif
-            error("Couldn't connect to webcam.\n");
+            perror(" Couldn't connect to webcam.\n");
+			exit(0);
         }
 #endif
     }
+
+	/* Uniform inter frame gap */
+	if(demo_const_cap)
+	{
+		fetch_offset = (int)cam_frame_rate / 2.;
+	}
 
     layer l = net.layers[net.n-1];
     int j;
@@ -414,6 +424,15 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             int local_nboxes = nboxes;
             detection *local_dets = dets;
 
+#ifndef ZERO_SLACK
+            /* Change infer image for next object detection cycle*/
+            det_img = in_img;
+            det_s = in_s;
+
+            rtod_inference_thread(0);
+
+			show_img = det_img;
+#endif
             /* Fork fetch thread */
             if (!benchmark) if (pthread_create(&fetch_thread, 0, rtod_fetch_thread, 0)) error("Thread creation failed");
 
@@ -531,13 +550,13 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
                 free_image(det_s);
             }
 
-#ifndef ZERO_SLACK
-            /* Change infer image for next object detection cycle*/
-            det_img = in_img;
-            det_s = in_s;
-
-            rtod_inference_thread(0);
-#endif
+//#ifndef ZERO_SLACK
+//            /* Change infer image for next object detection cycle*/
+//            det_img = in_img;
+//            det_s = in_s;
+//
+//            rtod_inference_thread(0);
+//#endif
 
             if (time_limit_sec > 0 && (get_time_point() - start_time_lim)/1000000 > time_limit_sec) {
                 printf(" start_time_lim = %f, get_time_point() = %f, time spent = %f \n", start_time_lim, get_time_point(), get_time_point() - start_time_lim);
@@ -550,7 +569,9 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 #ifndef V4L2
                 if(!benchmark) release_mat(&show_img);
 #endif
+#ifdef ZERO_SLACK
                 show_img = det_img;
+#endif
             }
 #ifdef ZERO_SLACK
             det_img = in_img;
@@ -582,6 +603,7 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             }
         }
         cycle_array[cycle_index] = 1000./fps;
+		printf("Cycle time: %f\n", cycle_array[cycle_index]);
         cycle_index = (cycle_index + 1) % 4;
         slack_time = (MAX(d_infer, d_disp)) - (fetch_offset + d_fetch);
 
@@ -624,8 +646,8 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             b_fetch_max = MAX(b_fetch_max, b_fetch);
         }
         else if(cnt == (CYCLE_OFFSET - 1)){
-            //fetch_offset = (int)(s_min - e_fetch_max - b_fetch_max);
-            fetch_offset = 0;
+            fetch_offset = (int)(s_min - e_fetch_max - b_fetch_max);
+            //fetch_offset = 0;
             printf("fetch_offset : %d\n", fetch_offset);
 
             measure = 0;

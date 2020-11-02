@@ -1890,6 +1890,7 @@ void run_detector(int argc, char **argv)
 	int w = find_int_arg(argc, argv, "-w", 640);
 	int h = find_int_arg(argc, argv, "-h", 480);
 	int fps = find_int_arg(argc, argv, "-fps", 30);
+	int const_cap = find_arg(argc, argv, "-const_capture");
     if (argc < 4) {
         fprintf(stderr, "usage: %s %s [train/test/valid/demo/map] [data] [cfg] [weights (optional)]\n", argv[0], argv[1]);
         return;
@@ -1960,7 +1961,7 @@ void run_detector(int argc, char **argv)
             if (strlen(filename) > 0)
                 if (filename[strlen(filename) - 1] == 0x0d) filename[strlen(filename) - 1] = 0;
         rtod(cfg, weights, thresh, hier_thresh, cam_index, filename, names, classes, frame_skip, prefix, out_filename,
-                mjpeg_port, json_port, dont_show, ext_output, letter_box, time_limit_sec, http_post_host, benchmark, benchmark_layers, w, h, fps);
+                mjpeg_port, json_port, dont_show, ext_output, letter_box, time_limit_sec, http_post_host, benchmark, benchmark_layers, w, h, fps, const_cap);
 
         free_list_contents_kvp(options);
         free_list(options);
