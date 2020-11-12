@@ -17,8 +17,14 @@
 #include <sys/time.h>
 #endif
 
+#define SERIAL
+
 #ifdef V4L2
 #include "v4l2.h"
+#endif
+
+#ifdef SERIAL
+#include "serial.h"
 #endif
 
 #ifdef OPENCV
@@ -62,6 +68,8 @@ extern double num_object_sum = 0;
 extern double trace_data_sum = 0;
 
 int *fd_handler = NULL;
+
+int is_go = 0;
 
 #ifndef ZERO_SLACK
 int contention_free = 1;
@@ -699,6 +707,7 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             det_img = in_img;
             det_s = in_s;
 #endif
+
             cycle_end = get_time_in_ms();
         }
         --delay;
@@ -740,10 +749,14 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 #endif
 
 #ifdef MEASUREMENT
-        if (cnt >= CYCLE_OFFSET) push_data();
+        if (cnt >= CYCLE_OFFSET) 
+        {
+            is_go = 1;
+            push_data();
+        }
 
         /* Exit object detection cycle */
-        if(cnt == ((OBJ_DET_CYCLE_IDX + CYCLE_OFFSET) - 1)) 
+        if (cnt == ((OBJ_DET_CYCLE_IDX + CYCLE_OFFSET) - 1)) 
         {
             if(-1 == write_result())
             {
@@ -755,6 +768,40 @@ void rtod(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             break;
         }
 #endif
+        if (is_go){
+            int *serial_handler = NULL;
+            int baudrate = 9600;
+            char dev[256] = "/dev/ttyACM0";
+            char buf[256];
+
+            serial_handler = serial_open(dev, baudrate);
+            if (NULL == serial_handler)
+            {
+                fprintf(stderr, "ERROR: Fail to open %s\n", dev);
+                exit(0);
+            }
+
+            //            usleep(1000 * 1000);
+
+            for (int i = 0; i < 100; i++)
+            {
+                if (-1 == serial_write(*serial_handler, "0", 1))
+                {
+                    fprintf(stderr, "ERROR: Fail to write\n");
+                    exit(0);
+                }
+            }
+
+            //            for (int i = 0; i < 100; i++)
+            //            {
+            //                if (-1 == serial_read(*serial_handler, buf, 64))
+            //                {
+            //                    fprintf(stderr, "ERROR: Fail to read\n");
+            //                    exit(0);
+            //                }
+            //            }
+            break;
+        }
 
         /* Increase count */
         if(cnt != ((OBJ_DET_CYCLE_IDX + CYCLE_OFFSET)-1)) cnt++;
