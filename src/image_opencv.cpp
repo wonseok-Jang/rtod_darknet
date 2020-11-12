@@ -683,7 +683,9 @@ extern "C" {
 
                     f->frame_timestamp = cpp_cap.get(CV_CAP_PROP_POS_MSEC);
                     f->frame_sequence = cpp_cap.get(CV_CAP_PROP_POS_FRAMES);
+#ifndef V4L2
                     f->select = cpp_cap.get(CV_CAP_PROP_SELECT);
+#endif
                 }
                 else std::cout << " Video-stream stopped! \n";
             }
@@ -983,7 +985,6 @@ extern "C" {
             extern int num_object; // number of detections
             extern int display_index;
             extern struct det_result det_res[3];
-            extern int is_go;
             int k = 0;
 
             for (i = 0; i < num; ++i) {
@@ -1001,11 +1002,6 @@ extern "C" {
                             strcat(labelstr, buff);
                             printf("%s: %.0f%% ", names[j], dets[i].prob[j] * 100);
                             det_res[display_index].name[i] = names[j];
-                            if (names[j] == "cup")
-                            {
-                                is_go = 1;
-                                return ;
-                            }
                         }
                         else {
                             strcat(labelstr, ", ");
