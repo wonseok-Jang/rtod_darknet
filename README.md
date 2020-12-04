@@ -12,16 +12,17 @@ More details
 ```
 $ git clone --recursive https://github.com/AveesLab/R-TOD
 ```
-* Rebuild OpenCV: See **OpenCV rebuild** in https://github.com/AveesLab/OpenCV-3.3.1
+* To use 'On-demand Capture method' with OpenCV, you don't need any modification. Just build it. See **OpenCV rebuild** in https://github.com/AveesLab/OpenCV-3.3.1.
 
 ### Compile using 'Make' ###
-* `V4L2=1`: Fetch image with On-demand capture using V4L2 ioctl without OpenCV library (0: Fetch image using OpenCV).
-* `ZERO_SLACK=1`: Use Zero-slack pipeline (0 means Contention-free pipeline).
+* `V4L2=1`: Fetch image with On-demand capture method using V4L2 ioctl without OpenCV library (0: Fetch image using OpenCV).
+* `ZERO_SLACK=1`: Use Zero-Slack Pipeline method
+* `CONTENTION_FREE=1`: Use Contention-Free Pipeline method
 * `MEASUREMENT=1`: Measure delay (capture ~ display) and log to csv file (See [Measurement setup](#measurement-setup)).
 
 ### How to set On-demand capture
-* Build `V4L2=0`: See https://github.com/AveesLab/OpenCV-3.3.1.
-* Build `V4L2=1`: No setup required.
+* When you build with `V4L2=0`: See https://github.com/AveesLab/OpenCV-3.3.1 .
+* When you build with `V4L2=1`: No setup required.
 
 ### Measurement setup ###
 * If you build with `MEASUREMENT=0`, never stop until terminated by user.
