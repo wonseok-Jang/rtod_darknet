@@ -8,7 +8,7 @@ More details
 # R-TOD: Real-Time Object Detector
 
 ### Installation ###
-* Clone R-TOD repository (Submodule: https://github.com/AveesLab/OpenCV-3.3.1)
+* Clone R-TOD (Submodule: https://github.com/AveesLab/OpenCV-3.3.1)
 ```
 $ git clone --recursive https://github.com/AveesLab/R-TOD
 ```
@@ -21,7 +21,7 @@ $ git clone --recursive https://github.com/AveesLab/R-TOD
 * `MEASUREMENT=1`: Measure delay (capture ~ display) and log to csv file (See [Measurement setup](#measurement-setup)).
 
 ### How to use On-demand capture
-* If you build with `V4L2=0`: See https://github.com/AveesLab/OpenCV-3.3.1 .
+* If you build with `V4L2=0`: See **Capture methods** in https://github.com/AveesLab/OpenCV-3.3.1 .
 * If you build with `V4L2=1`: No setup required.
 
 ### Measurement setup ###
