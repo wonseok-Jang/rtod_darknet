@@ -1,4 +1,11 @@
-# R-TOD: Real-Time Object Detector
+# R-TOD: Real-Time Object Detector with Minimized End-to-End Delay for Autonomous Driving
+### Hardware
+* Nvidia Jetson AGX Xavier
+* Logitech C930e USB camera
+### Software
+* Ubuntu 18.04 with JetPack-4.2.2
+* OpenCV-3.3.1
+* CUDA 10.0
 
 # More details
 * http://pjreddie.com/darknet/yolo/
@@ -61,4 +68,17 @@ $ ./darknet detector rtod cfg/coco.data cfg weights
 $ ./darknet detector rtod cfg/coco.data cfg weights
        cfg: YOLO network configure file
    weights: weights file
+```
+
+# Citation
+The paper can be found [here](https://arxiv.org/pdf/2011.06372.pdf). For citation, please use the following Bibtex.
+```
+@misc{jang2020rtod,
+      title={R-TOD: Real-Time Object Detector with Minimized End-to-End Delay for Autonomous Driving}, 
+      author={Wonseok Jang and Hansaem Jeong and Kyungtae Kang and Nikil Dutt and Jong-Chan Kim},
+      year={2020},
+      eprint={2011.06372},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
 ```
