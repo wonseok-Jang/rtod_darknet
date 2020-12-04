@@ -12,7 +12,7 @@ More details
 ```
 $ git clone --recursive https://github.com/AveesLab/R-TOD
 ```
-* To use 'On-demand Capture method' with OpenCV, you don't need any modification. Just build it. See **OpenCV rebuild** in https://github.com/AveesLab/OpenCV-3.3.1.
+* To use **On-demand Capture** with OpenCV, you don't need any modification. Just build it. See **OpenCV rebuild** in https://github.com/AveesLab/OpenCV-3.3.1.
 
 ### Compile using 'Make' ###
 * `V4L2=1`: Fetch image with On-demand capture method using V4L2 ioctl without OpenCV library (0: Fetch image using OpenCV).
@@ -36,27 +36,30 @@ $ git clone --recursive https://github.com/AveesLab/R-TOD
 
 ### Usage ###
 
-#### Original pipeline
-You can choose two capture method (Orignal capture & On-demand capture).
-* See **Image capture** in https://github.com/AveesLab/OpenCV-3.3.1.
-* **Original capture**: Orignal darknet with nothing modified.
-* **On-demand capture**: Remove unnecessary image queue.
+#### Original Darknet
 ```
 $ ./darknet detector demo cfg/coco.data cfg weights 
      cfg : path to yolo network configure file
   weights: path to weights file
 ```
-#### Zero-slack pipeline
+#### +On-demand Capture
 * See [How to set On-demand capture](#how-to-set-on--demand-capture).
+```
+$ ./darknet detector demo cfg/coco.data cfg weights 
+     cfg : path to yolo network configure file
+  weights: path to weights file
+```
+#### Zero-Slack Pipeline
+* Zero-Slack Pipeline needs **On-demand Capture**. See [How to set On-demand capture](#how-to-set-on--demand-capture).
 * Compile with `ZERO_SLACK=1`.
 ```
 $ ./darknet detector rtod cfg/coco.data cfg weights
       cfg : path to yolo network configure file
       weights: path to weights file
 ```
-#### Contention-free pipeline
-* See [How to set On-demand capture](#how-to-set-on--demand-capture).
-* Compile with `ZERO_SLACK=0`.
+#### Contention-Free Pipeline
+* Contention-Free Pipeline needs **On-demand Capture**. See [How to set On-demand capture](#how-to-set-on--demand-capture).
+* Compile with `CONTENTION_FREE=1`.
 ```
 $ ./darknet detector rtod cfg/coco.data cfg weights
       cfg : path to yolo network configure file
