@@ -21,11 +21,11 @@ $ git clone --recursive https://github.com/AveesLab/R-TOD
 * `MEASUREMENT=1`: Measure delay (capture ~ display) and log to csv file (See [Measurement setup](#measurement-setup)).
 
 ### How to set On-demand capture
-* When you build with `V4L2=0`: See https://github.com/AveesLab/OpenCV-3.3.1 .
-* When you build with `V4L2=1`: No setup required.
+* If you build with `V4L2=0`: See https://github.com/AveesLab/OpenCV-3.3.1 .
+* If you build with `V4L2=1`: No setup required.
 
 ### Measurement setup ###
-* If you build with `MEASUREMENT=0`, never stop until terminated by user.
+* If you build with `MEASUREMENT=0`, application will not stop until terminated by user.
 * In `src/rtod.h`, you can modify measurement setup.
 ```
 /* Measurement */
