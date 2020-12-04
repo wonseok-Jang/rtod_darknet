@@ -7,14 +7,14 @@ More details
 
 # R-TOD: Real-Time Object Detector
 
-### Installation ###
+### Installation 
 * Clone R-TOD (Submodule: https://github.com/AveesLab/OpenCV-3.3.1)
 ```
 $ git clone --recursive https://github.com/AveesLab/R-TOD
 ```
 * To use **On-demand Capture** with OpenCV, you don't need any modification. Just build it. See **OpenCV rebuild** in https://github.com/AveesLab/OpenCV-3.3.1.
 
-### Compile using 'Make' ###
+### Compile using 'Make' 
 * `V4L2=1`: Fetch image with On-demand capture method using V4L2 ioctl without OpenCV library (0: Fetch image using OpenCV).
 * `ZERO_SLACK=1`: Use Zero-Slack Pipeline method
 * `CONTENTION_FREE=1`: Use Contention-Free Pipeline method
@@ -24,7 +24,7 @@ $ git clone --recursive https://github.com/AveesLab/R-TOD
 * If you build with `V4L2=0`: See **Capture methods** in https://github.com/AveesLab/OpenCV-3.3.1 .
 * If you build with `V4L2=1`: No setup required.
 
-### Measurement setup ###
+### Measurement setup 
 * If you build with `MEASUREMENT=0`, application will not stop until terminated by user.
 * In `src/rtod.h`, you can modify measurement setup.
 ```
@@ -34,7 +34,7 @@ $ git clone --recursive https://github.com/AveesLab/R-TOD
 #define OBJ_DET_CYCLE_IDX     // Count of measurement
 ```
 
-### Usage ###
+### Usage 
 
 #### Original Darknet
 ```
