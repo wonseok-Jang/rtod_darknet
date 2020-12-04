@@ -39,29 +39,29 @@ $ git clone --recursive https://github.com/AveesLab/R-TOD
 #### Original Darknet
 ```
 $ ./darknet detector demo cfg/coco.data cfg weights 
-     cfg : path to yolo network configure file
-  weights: path to weights file
+      cfg: YOLO network configure file
+  weights: weights file
 ```
 #### +On-demand Capture
 * See [How to set On-demand capture](#how-to-set-on--demand-capture).
 ```
 $ ./darknet detector demo cfg/coco.data cfg weights 
-     cfg : path to yolo network configure file
-  weights: path to weights file
+      cfg: YOLO network configure file
+  weights: weights file
 ```
 #### Zero-Slack Pipeline
 * **Zero-Slack Pipeline** needs **On-demand Capture**. See [How to set On-demand capture](#how-to-set-on--demand-capture).
 * Build with `ZERO_SLACK=1`.
 ```
 $ ./darknet detector rtod cfg/coco.data cfg weights
-      cfg : path to yolo network configure file
-      weights: path to weights file
+       cfg: YOLO network configure file
+   weights: weights file
 ```
 #### Contention-Free Pipeline
 * **Contention-Free Pipeline** needs **On-demand Capture**. See [How to set On-demand capture](#how-to-set-on--demand-capture).
 * Build with `CONTENTION_FREE=1`.
 ```
 $ ./darknet detector rtod cfg/coco.data cfg weights
-      cfg : path to yolo network configure file
-   weights: path to weights file
+       cfg: YOLO network configure file
+   weights: weights file
 ```
